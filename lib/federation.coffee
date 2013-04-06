@@ -1,13 +1,17 @@
 debug = require('debug') 'federation'
 crypto = require 'crypto'
-# async = require 'async'
+async = require 'async'
+EventEmitter = require('events').EventEmitter
+randname = require './randname'
 
 md5 = (s) ->
 	crypto.createHash('md5').update(s).digest('hex')
 
-module.exports = class Fedaration 
+module.exports = class Federation 
 
 	constructor: (@hub) ->
+		@name = randname.get()
+		debug "NAME --- " + @name.red
 		@fed = @hub.multiplex('federation')
 
 		@fed.on 'connect', (from) =>
@@ -18,24 +22,38 @@ module.exports = class Fedaration
 		    debug from + ' disconnected from app'.red
 		    debug "nodes" , @hub.nodes()
 
-		@fed.on 'message', (from, message) =>
-		    console.log from, 'in app says'.cyan, message
+		@fed.on 'message', (from, message, done) =>
+			if message?.type is 'search'
+				console.log '>>>>>>>>'.yellow
+				console.log message
+				@localSearch message, done
 
 
-	debug 'connected to app'
-
+	localSearch: (query, done) ->
+		done null, "local resullllllll #{@name}  " + JSON.stringify query
 
 	getNodes: () ->
 		@hub.nodes()
 	
 	search: (query, done) ->
+		console.log query.red
 		hash = md5 JSON.stringify query
-
-		for node in @hub.nodes()
-			@fed.send node, {search: query}
-			
-		done()	
 		
+		em = new EventEmitter 
+		
+		## poslu search request na ostatni nody
+		async.forEach @hub.nodes(), (node, next) =>
+			# console.log node
+			@fed.send node, {type: 'search', data: query}, (err, data) ->
+				## todo handle error
+				em.emit 'data', data 
 
+			next()
 
-	# app.send('json://another_member', {hello:'app'});
+		## poslu search na lokalni server
+		process.nextTick () =>
+			@localSearch data: query, (err, data) ->
+				## todo handle error
+				em.emit 'data', data 
+			
+		return em

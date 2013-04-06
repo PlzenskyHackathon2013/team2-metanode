@@ -20,22 +20,15 @@ exports.init = (federation) ->
 		res.json
 			welcome: '.meta'
 			hosts: federation.getNodes()
-
-	app.get '/search/:query', (req, res, next) ->
-		federation.search req.params.query, (err, data) ->
-			return next err if err
-			
-			res.json data
-
 	
 	io.sockets.on 'connection', (socket) ->
-	  socket.emit 'news', hello: 'world'
 
-	  socket.on 'plus', (data) ->
-		  console.log "#{data}".red
-		  socket.emit 'result', ++data
+		socket.on 'search', (data) ->
+			search = federation.search data
+			
+			search.on 'data', (data) ->
+				socket.emit 'search-result', data
 	  
-
 
 	port = process.config.port 
 	server.listen port
