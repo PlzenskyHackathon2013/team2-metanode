@@ -25,16 +25,18 @@ exports.init = (federation) ->
 	
 	io.sockets.on 'connection', (socket) ->
 		socket.on 'create-channel', (data) ->
+			debug 'create-channel'
 			federation.createChannel data, (err, data) ->
 				socket.emit 'channel-created', err or data
 				
 
 		socket.on 'publish', (data) ->
+			debug 'publish'
 			federation.publish data, (err, data) ->
 				socket.emit 'published', err or data
 
 		socket.on 'search', (data) ->
-			# console.log arguments
+			debug 'search'
 			search = federation.search data
 			search.on 'data', (data) ->
 				socket.emit 'search-result', data

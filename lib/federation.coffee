@@ -10,6 +10,8 @@ md5 = (s) ->
 module.exports = class Federation 
 
 	constructor: (@hub) ->
+		@registeredSearches = {}
+		
 		@name = randname.get()
 		debug "NAME --- " + @name.red
 		@fed = @hub.multiplex('federation')
@@ -28,21 +30,35 @@ module.exports = class Federation
 				type = message.type 
 				data = message.data
 				if type is 'search'
-					console.log '>>>>>>>>'.yellow
-					console.log message
+					# console.log '>>>>>>>>'.yellow
+					# console.log message
 					#@localSearch message, done
 					store.findAllForUri data, done
 					#done null, "search resultxxxx from #{@name}: " + JSON.stringify query
 					
 					
 				else if type is 'create-channel'
-					console.log data
+					# console.log data
 					store.createChannel data, done
 
 				else if type is 'find-channel'
-					console.log data
+					# console.log data
 					store.findChannel data, done
 
+
+				else if type is 'notify-update'
+					for item in data
+						# console.log 'uuuuuuuuuuu'
+						# console.log item
+						# console.log @registeredSearches
+						# store.findChannel data, done
+						if @registeredSearches[item.uri]
+							# console.log 'asd9adia9sdia9dias90dias90dia90sdi0d9iasd90aid90sd'
+							for rs in @registeredSearches[item.uri]
+								## TODO kdyz nema listenery, zabit
+								# console.log 'rrrrrrrrrr'.blue
+								rs.emit 'data', item
+					
 
 				else if type is 'publish'
 					store.publishToChannel data, message.channel, (err, data) =>
@@ -51,8 +67,9 @@ module.exports = class Federation
 						done err, data
 
 				
-	notifyUpdate: (data, done) ->
-		@fed.send @getAllNodes(), {type: 'notify-update', data: data}
+	notifyUpdate: (data) ->
+		for node in @getAllNodes()
+			@fed.send node, {type: 'notify-update', data: data}, () ->
 
 	createChannel: (data, done) ->
 		@fed.send @getRandomNode(), {type: 'create-channel', data: data}, done
@@ -84,18 +101,29 @@ module.exports = class Federation
 	getAllNodes: () ->
 		n = @hub.nodes()
 		n.push @hub.address
-		console.log n
+		# console.log n
 		n
 	
 	search: (query, done) ->
+		
+		@registeredSearches[query] ?= []
+		
 		# hash = md5 JSON.stringify query
 		em = new EventEmitter 
+		
+		
+		# TODO uklizet
+		@registeredSearches[query].push em
+		
+		
 		# jinak se to neemittne
 		process.nextTick () =>
 			async.forEach @getAllNodes(), (node, next) =>
 				# console.log node
 				@fed.send node, {type: 'search', data: query}, (err, data) ->
 					## todo handle error
+					return if data?.length is 0
+
 					em.emit 'data', data 
 
 				next()
