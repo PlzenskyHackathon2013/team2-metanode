@@ -1,17 +1,53 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="/jquery.min.js"></script>
 
-<button id="b">click</button>
+<button id="create">create channel</button>
+<button id="publish">publish</button>
+<style>
+button {
+	height: 100px;
+	width: 400px;
+	
+}
+
+</style>
 <pre>
 <div id="log"></div>
 <script>
 	var cislo = 1;
 
 	var socket = io.connect('http://' + document.location.host);
-	$('#b').click(function() {
-		socket.emit('search', 'mrdka');
+	$('#create').click(function() {
+		p = {
+			type: "comment",
+			name: "h@ters"
+		}
+		socket.emit('create-channel', p);
 
 	});
+	socket.on('channel-created', function (data) {
+		console.log(data);
+	});
+
+
+	$('#publish').click(function() {
+		p = {
+			uri: "http://blog.pavelzelezny.cz/",
+			channel: "f62aa611-3d53-41f1-ac87-310280b9f0b0",
+			message: "sd oakdsops as"
+		}
+		socket.emit('publish', p);
+
+	});
+	socket.on('published', function (data) {
+		console.log(data);
+	});
+
+
+	socket.on('publish-result', function (data) {
+		console.log(data);
+	});
+
 	socket.on('search-result', function (data) {
 		console.log(data);
 		cislo = data;

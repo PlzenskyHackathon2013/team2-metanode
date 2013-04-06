@@ -12,6 +12,8 @@ http = require('http')
 server = http.createServer(app)
 io = require('socket.io').listen(server);
 
+io.set 'log level', 0
+
 exports.init = (federation) ->	
 	app.use express.static 'public'
 
@@ -22,10 +24,18 @@ exports.init = (federation) ->
 			hosts: federation.getNodes()
 	
 	io.sockets.on 'connection', (socket) ->
+		socket.on 'create-channel', (data) ->
+			federation.createChannel data, (err, data) ->
+				socket.emit 'channel-created', err or data
+				
+
+		socket.on 'publish', (data) ->
+			federation.publish data, (err, data) ->
+				socket.emit 'published', err or data
 
 		socket.on 'search', (data) ->
+			# console.log arguments
 			search = federation.search data
-			
 			search.on 'data', (data) ->
 				socket.emit 'search-result', data
 	  

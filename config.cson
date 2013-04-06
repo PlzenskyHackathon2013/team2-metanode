@@ -1,2 +1,3 @@
 port: process.env.PORT or 8000
 peer: process.env.PEER
+mongo: "mongodb://localhost/meta?safe=true"

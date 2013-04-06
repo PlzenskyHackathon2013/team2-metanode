@@ -1,4 +1,4 @@
-hub = require('p2p-hub').connect('192.168.2.6')
+hub = require('p2p-hub').connect()
 
 
 app = hub.multiplex('app');

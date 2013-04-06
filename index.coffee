@@ -3,7 +3,7 @@ require 'colors'
 require('cson-config').load()
 
 
-hub = require('p2p-hub').connect("192.168.2.6")
+hub = require('p2p-hub').connect()
 
 Federation = require('./lib/federation')
 fed = new Federation hub
