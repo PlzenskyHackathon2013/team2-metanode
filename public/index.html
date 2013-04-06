@@ -68,7 +68,7 @@ button {
 		$('#log').html($('#log').html() + "<br>" + new Date() + " "+ cislo);
 		
 	});
-	socket.emit('search', 'http://blog.pavelzelezny.cz/');
+	socket.emit('search', 'http://localhost:8000/');
 	
 	
 	// socket.on('news', function (data) {

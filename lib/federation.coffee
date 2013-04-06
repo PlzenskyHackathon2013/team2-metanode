@@ -61,7 +61,7 @@ module.exports = class Federation
 							for rs in @registeredSearches[item.uri]
 								## TODO kdyz nema listenery, zabit
 								# console.log 'rrrrrrrrrr'.blue
-								rs.emit 'data', item
+								rs.emit 'data', [item]
 					
 
 				else if type is 'publish'
