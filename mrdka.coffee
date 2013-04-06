@@ -1,4 +1,4 @@
-hub = require('p2p-hub').connect("json://10.10.10.58")
+hub = require('p2p-hub').connect()
 
 fed = hub.multiplex('federation')
 

@@ -30,7 +30,7 @@ module.exports = class Federation
 
 
 	localSearch: (query, done) ->
-		done null, "local resullllllll #{@name}  " + JSON.stringify query
+		done null, "search result from #{@name}: " + JSON.stringify query
 
 	getNodes: () ->
 		@hub.nodes()
