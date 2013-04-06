@@ -15,6 +15,9 @@ exports.createChannel = (data, done) ->
 		done err, result?[0]
 		
 
+exports.findAllChannels = (done) ->
+	m.collection('channels').find().toArray done #(err, result) ->
+
 exports.findAllForUri = (uri, done) ->
 	# debug "looking up channel #{uuid}"
 	m.collection('channel_data').find(uri: uri ).toArray done #(err, result) ->
@@ -35,6 +38,7 @@ exports.publishToChannel = (data, channel, done) ->
 		uri: data.uri
 		channel: channel.uuid
 		message: data.message
+		date: new Date
 
 	m.collection("channel_data").insert o, done #(err, result) ->
 	

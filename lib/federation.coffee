@@ -46,6 +46,10 @@ module.exports = class Federation
 					store.findChannel data, done
 
 
+				else if type is 'find-all-channels'
+					store.findAllChannels done
+
+
 				else if type is 'notify-update'
 					for item in data
 						# console.log 'uuuuuuuuuuu'
@@ -105,13 +109,9 @@ module.exports = class Federation
 		n
 	
 	search: (query, done) ->
-		
 		@registeredSearches[query] ?= []
-		
-		# hash = md5 JSON.stringify query
 		em = new EventEmitter 
-		
-		
+
 		# TODO uklizet
 		@registeredSearches[query].push em
 		
@@ -121,6 +121,26 @@ module.exports = class Federation
 			async.forEach @getAllNodes(), (node, next) =>
 				# console.log node
 				@fed.send node, {type: 'search', data: query}, (err, data) ->
+					## todo handle error
+					return if data?.length is 0
+
+					em.emit 'data', data 
+
+				next()
+
+			
+		return em
+
+
+	findChannels: (done) ->
+		em = new EventEmitter 
+
+		# jinak se to neemittne
+		process.nextTick () =>
+			async.forEach @getAllNodes(), (node, next) =>
+				# console.log node
+				@fed.send node, {type: 'find-all-channels'}, (err, data) ->
+					# console.log arguments
 					## todo handle error
 					return if data?.length is 0
 

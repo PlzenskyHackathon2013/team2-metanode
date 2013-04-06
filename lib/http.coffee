@@ -30,6 +30,16 @@ exports.init = (federation) ->
 				socket.emit 'channel-created', err or data
 				
 
+		socket.on 'find-channels', (data) ->
+			debug 'find-channels'
+			search = federation.findChannels()
+			search.on 'data', (data) ->
+				socket.emit 'search-result', data
+			
+			# federation.findChannels data, (err, data) ->
+			# 	
+			# 	socket.emit 'channels-found', err or data
+
 		socket.on 'publish', (data) ->
 			debug 'publish'
 			federation.publish data, (err, data) ->

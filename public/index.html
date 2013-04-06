@@ -3,6 +3,7 @@
 
 <button id="create">create channel</button>
 <button id="publish">publish</button>
+<button id="find">find</button>
 <style>
 button {
 	height: 100px;
@@ -42,6 +43,19 @@ button {
 	socket.on('published', function (data) {
 		console.log(data);
 	});
+
+
+
+
+	$('#find').click(function() {
+		socket.emit('find-channels');
+
+	});
+	socket.on('channels-found', function (data) {
+		console.log(data);
+	});
+
+
 
 
 	socket.on('publish-result', function (data) {
