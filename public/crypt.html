@@ -1,0 +1,42 @@
+<html>
+	<head>
+		<script src="./cryptico.min.js"></script>
+		<script src="./jquery.min.js"></script>
+		<script>
+			$(document).ready(function(){
+				var clientKey;
+				var serverKey = cryptico.generateRSAKey("server uber password",1024);
+				var serverKeyString = cryptico.publicKeyString(serverKey);
+
+				$("#gen").click(function(b){
+					var PassPhrase = "fooBar"
+					var Bits = 1024;
+					clientKey = cryptico.generateRSAKey(PassPhrase, Bits);
+					clientKeyString = cryptico.publicKeyString(clientKey);
+					console.log(clientKey);
+				});
+				$("#decrypt").click(function(t){
+					var res = cryptico.decrypt($("#out").val(),serverKey);
+					console.log(res);
+					
+					alert(res.plaintext);
+					//var res = cryptico.
+					//clientKey.
+				});
+				$("#encrypt").click(function(t){
+					var res = cryptico.encrypt($("#in").val(),serverKeyString,clientKey);
+					console.log(res);
+					$("#out").val(res.cipher);
+					//cryptico.encrypt(
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<button id="gen">gen cert</button><br />
+		<textarea id="in"></textarea><br />
+		<textarea id="out"></textarea><br />
+		<button id="decrypt">decrypt</button>
+		<button id="encrypt">encrypt</button>
+	</body>
+</html>
