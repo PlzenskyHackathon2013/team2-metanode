@@ -30,20 +30,29 @@ module.exports = class Federation
 				if type is 'search'
 					console.log '>>>>>>>>'.yellow
 					console.log message
-					@localSearch message, done
-				if type is 'create-channel'
+					#@localSearch message, done
+					store.findAllForUri data, done
+					#done null, "search resultxxxx from #{@name}: " + JSON.stringify query
+					
+					
+				else if type is 'create-channel'
 					console.log data
 					store.createChannel data, done
 
-				if type is 'find-channel'
+				else if type is 'find-channel'
 					console.log data
 					store.findChannel data, done
 
 
-				if type is 'publish'
-					store.publishToChannel data, message.channel, done
+				else if type is 'publish'
+					store.publishToChannel data, message.channel, (err, data) =>
+						@notifyUpdate data unless err
+						
+						done err, data
 
 				
+	notifyUpdate: (data, done) ->
+		@fed.send @getAllNodes(), {type: 'notify-update', data: data}
 
 	createChannel: (data, done) ->
 		@fed.send @getRandomNode(), {type: 'create-channel', data: data}, done
@@ -67,8 +76,6 @@ module.exports = class Federation
 
 		
 
-	localSearch: (query, done) ->
-		done null, "search resultxxxx from #{@name}: " + JSON.stringify query
 
 	getRandomNode: () ->
 		n = @getAllNodes()

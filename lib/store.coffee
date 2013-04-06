@@ -14,6 +14,13 @@ exports.createChannel = (data, done) ->
 		# console.log arguments
 		done err, result?[0]
 		
+
+exports.findAllForUri = (uri, done) ->
+	# debug "looking up channel #{uuid}"
+	m.collection('channel_data').find(uri: uri ).toArray done #(err, result) ->
+		# console.log arguments
+#		done err, result?[0]
+
 	
 exports.findChannel = (uuid, done) ->
 	debug "looking up channel #{uuid}"
@@ -24,24 +31,14 @@ exports.findChannel = (uuid, done) ->
 
 exports.publishToChannel = (data, channel, done) ->
 	debug "publishing #{data.uri} to #{channel.name}"
-	
-	m.collection("channel_#{channel_type}").find(uri: data.uri).toArray (err, result) ->
-		return done err if err
+	o = 
+		uri: data.uri
+		channel: channel.uuid
+		message: data.message
 
-		channelData = result?[0]
-		unless channelData 
-			channelData = 
-				uri: data.uri
-				channel: channel.uuid
-			channelData["#{channel_type}"] = []
-				
-		console.log channelData 
-				
-		
-			
-		
-		# console.log arguments
-		done err, result?[0]
+	m.collection("channel_data").insert o, done #(err, result) ->
+	
+		# done err, result?[0]
 		
 
 

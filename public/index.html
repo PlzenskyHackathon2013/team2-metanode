@@ -34,7 +34,7 @@ button {
 		p = {
 			uri: "http://blog.pavelzelezny.cz/",
 			channel: "f62aa611-3d53-41f1-ac87-310280b9f0b0",
-			message: "sd oakdsops as"
+			message: "to je ale pusik"
 		}
 		socket.emit('publish', p);
 
@@ -54,7 +54,7 @@ button {
 		$('#log').html($('#log').html() + "<br>" + new Date() + " "+ cislo);
 		
 	});
-	socket.emit('search', 'mrdka');
+	socket.emit('search', 'http://blog.pavelzelezny.cz/');
 	
 	
 	// socket.on('news', function (data) {
