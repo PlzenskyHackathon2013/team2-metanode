@@ -24,6 +24,7 @@ exports.init = (federation) ->
 			hosts: federation.getNodes()
 	
 	io.sockets.on 'connection', (socket) ->
+		
 		socket.on 'create-channel', (data) ->
 			debug 'create-channel'
 			federation.createChannel data, (err, data) ->
@@ -46,8 +47,15 @@ exports.init = (federation) ->
 			federation.publish data, (err, data) ->
 				socket.emit 'published', err or data
 
+		socket.on 'unsearch', (data) ->
+			data.emhash = socket.store.id + data.hash
+			debug 'unsearch', data.emhash
+			search = federation.unsearch data
+
 		socket.on 'search', (data) ->
-			debug 'search'
+			data.emhash = socket.store.id + data.hash
+			
+			debug 'search', data.emhash
 			search = federation.search data
 			search.on 'data', (data) ->
 				socket.emit 'search-result', data

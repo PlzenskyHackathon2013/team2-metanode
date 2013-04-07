@@ -58,9 +58,10 @@ module.exports = class Federation
 						# store.findChannel data, done
 						if @registeredSearches[item.uri]
 							# console.log 'asd9adia9sdia9dias90dias90dia90sdi0d9iasd90aid90sd'
-							for rs in @registeredSearches[item.uri]
+							for key,rs of @registeredSearches[item.uri]
 								## TODO kdyz nema listenery, zabit
 								# console.log 'rrrrrrrrrr'.blue
+								item.hash = rs.hash
 								rs.emit 'data', [item]
 					
 
@@ -107,14 +108,22 @@ module.exports = class Federation
 		n.push @hub.address
 		# console.log n
 		n
-	
-	search: (query, done) ->
-		@registeredSearches[query] ?= []
-		em = new EventEmitter 
-
-		# TODO uklizet
-		@registeredSearches[query].push em
+	unsearch: (data, done) ->
+		data.hash
+		delete @registeredSearches[query][data.emhash]
 		
+	
+	search: (data, done) ->
+		query = data.uri
+		
+		@registeredSearches[query] ?= {}
+		em = new EventEmitter 
+		
+		# TODO uklizet
+		@registeredSearches[query][data.emhash] = em
+		
+		hash = data.hash 
+		em.hash = hash
 		
 		# jinak se to neemittne
 		process.nextTick () =>
@@ -123,6 +132,8 @@ module.exports = class Federation
 				@fed.send node, {type: 'search', data: query}, (err, data) ->
 					## todo handle error
 					return if data?.length is 0
+					for item in data
+						item.hash = hash
 
 					em.emit 'data', data 
 

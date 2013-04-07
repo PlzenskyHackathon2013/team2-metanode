@@ -68,7 +68,7 @@ button {
 		$('#log').html($('#log').html() + "<br>" + new Date() + " "+ cislo);
 		
 	});
-	socket.emit('search', 'http://localhost:8000/');
+	socket.emit('search', {uri:'http://localhost:8000/', hash: 'mrdka'});
 	
 	
 	// socket.on('news', function (data) {
